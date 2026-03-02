@@ -717,4 +717,437 @@ body {
     .footer {
         padding-bottom: 40px;
     }
+
+    /* Responsive for Reviews and Forms */
+    .reviews-section {
+        font-size: 14px;
+    }
+
+    .star-rating-input {
+        font-size: 24px;
+    }
+
+    .order-modal-content,
+    .tracking-modal-content {
+        width: 95%;
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+        font-size: 16px; /* Prevents zoom on focus on mobile */
+    }
+
+    .order-header {
+        flex-direction: column;
+        gap: 10px;
+        align-items: flex-start;
+    }
+
+    .form-actions {
+        flex-direction: column;
+    }
+
+    .form-actions .btn {
+        width: 100%;
+    }
+}
+
+/* ============================================
+   Reviews & Ratings Styles
+   ============================================ */
+
+.reviews-section {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 2px solid var(--border-color);
+}
+
+.reviews-section h3 {
+    margin-bottom: 20px;
+    color: var(--dark-color);
+    font-size: 18px;
+}
+
+.reviews-list {
+    margin-bottom: 30px;
+}
+
+.no-reviews {
+    color: #999;
+    font-style: italic;
+    padding: 15px;
+    background-color: #f5f5f5;
+    border-radius: 5px;
+}
+
+.reviews-summary {
+    margin-bottom: 20px;
+    padding: 15px;
+    background: linear-gradient(135deg, #fff5f7 0%, #ffe4eb 100%);
+    border-radius: 8px;
+}
+
+.avg-rating {
+    text-align: center;
+}
+
+.avg-rating-number {
+    font-size: 36px;
+    font-weight: bold;
+    color: var(--primary-color);
+}
+
+.avg-rating-stars {
+    font-size: 24px;
+    color: #ffc107;
+    margin: 5px 0;
+    letter-spacing: 3px;
+}
+
+.avg-rating-count {
+    font-size: 14px;
+    color: #999;
+}
+
+.reviews-items {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.review-item {
+    padding: 15px;
+    background: #f9f9f9;
+    border-left: 4px solid var(--primary-color);
+    border-radius: 5px;
+}
+
+.review-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.review-author {
+    font-weight: 600;
+    color: var(--dark-color);
+}
+
+.review-rating {
+    font-size: 18px;
+    color: #ffc107;
+    letter-spacing: 2px;
+}
+
+.review-text {
+    margin: 10px 0;
+    color: #555;
+    line-height: 1.5;
+}
+
+.review-date {
+    font-size: 12px;
+    color: #999;
+}
+
+/* Star Rating Input */
+.rating-input {
+    margin-bottom: 15px;
+}
+
+.rating-input label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+
+.star-rating-input {
+    display: flex;
+    gap: 10px;
+    font-size: 32px;
+    margin-bottom: 10px;
+}
+
+.star-rating-input .star {
+    cursor: pointer;
+    color: #ddd;
+    transition: all 0.2s ease;
+    user-select: none;
+}
+
+.star-rating-input .star:hover,
+.star-rating-input .star.hover {
+    color: #ffc107;
+    transform: scale(1.1);
+}
+
+.star-rating-input .star.active {
+    color: #ffc107;
+}
+
+/* Review Form */
+.add-review {
+    padding: 20px;
+    background: linear-gradient(135deg, #fff9f0 0%, #ffe8d6 100%);
+    border-radius: 8px;
+    margin-top: 20px;
+}
+
+.add-review h4 {
+    margin-bottom: 15px;
+    color: var(--dark-color);
+}
+
+.add-review textarea,
+.add-review input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    font-family: inherit;
+    font-size: 14px;
+    resize: vertical;
+}
+
+.add-review textarea {
+    min-height: 100px;
+}
+
+/* ============================================
+   Order Form Styles
+   ============================================ */
+
+.order-modal-content {
+    max-width: 600px;
+}
+
+.order-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: var(--dark-color);
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+    padding: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    font-family: inherit;
+    font-size: 14px;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 5px rgba(255, 105, 180, 0.3);
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.form-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+.btn-small {
+    padding: 8px 16px;
+    font-size: 12px;
+}
+
+/* ============================================
+   Order Tracking Styles
+   ============================================ */
+
+.tracking-modal-content {
+    max-width: 700px;
+}
+
+.tracking-search {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.tracking-search input {
+    padding: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.tracking-search input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 5px rgba(255, 105, 180, 0.3);
+}
+
+.tracking-search .link {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-size: 14px;
+    text-align: center;
+}
+
+.tracking-search .link:hover {
+    text-decoration: underline;
+}
+
+/* Tracking Result */
+.tracking-result {
+    padding: 20px;
+    background: #f9f9f9;
+    border-radius: 8px;
+}
+
+.order-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.order-id {
+    font-weight: 600;
+    color: var(--dark-color);
+}
+
+.order-status {
+    font-weight: 600;
+}
+
+/* Timeline Styles */
+.tracking-timeline {
+    position: relative;
+    padding: 20px 0;
+}
+
+.tracking-timeline::before {
+    content: '';
+    position: absolute;
+    left: 20px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--border-color);
+}
+
+.timeline-step {
+    display: flex;
+    margin-bottom: 30px;
+    position: relative;
+}
+
+.timeline-marker {
+    width: 40px;
+    height: 40px;
+    background: white;
+    border: 3px solid var(--border-color);
+    border-radius: 50%;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 20px;
+}
+
+.timeline-marker.completed {
+    background: var(--success-color);
+    border-color: var(--success-color);
+    color: white;
+    font-weight: bold;
+}
+
+.timeline-marker.confirmed {
+    background: var(--success-color);
+    border-color: var(--success-color);
+    color: white;
+}
+
+.timeline-content {
+    padding-top: 5px;
+}
+
+.timeline-content h4 {
+    margin: 0 0 5px 0;
+    color: var(--dark-color);
+    font-size: 16px;
+}
+
+.timeline-content p {
+    margin: 0;
+    font-size: 13px;
+    color: #999;
+}
+
+/* My Orders */
+.my-orders-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.my-order-item {
+    padding: 15px;
+    background: #f9f9f9;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+}
+
+.order-item-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.order-item-id {
+    font-weight: 600;
+    color: var(--dark-color);
+}
+
+.order-item-status {
+    font-weight: 600;
+    font-size: 12px;
+}
+
+.order-item-info {
+    margin-bottom: 15px;
+}
+
+.order-item-info p {
+    margin: 5px 0;
+    font-size: 14px;
+}
+
+.no-orders {
+    text-align: center;
+    padding: 30px;
+    color: #999;
+    font-style: italic;
 }

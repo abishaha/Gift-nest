@@ -117,6 +117,21 @@ let cartIconLink;
 let closeButtons;
 
 let cart = [];
+let reviews = {}; // Store reviews by product ID
+let orders = []; // Store orders
+let currentProductId = null; // Track current product being reviewed
+let orderDetails = {}; // Store current order details
+let currentRating = 0; // Track current star rating
+
+// Initialize reviews from localStorage
+if (localStorage.getItem('giftnest-reviews')) {
+    reviews = JSON.parse(localStorage.getItem('giftnest-reviews'));
+}
+
+// Initialize orders from localStorage
+if (localStorage.getItem('giftnest-orders')) {
+    orders = JSON.parse(localStorage.getItem('giftnest-orders'));
+}
 
 /* ============================================
    Initialize App
@@ -135,6 +150,32 @@ document.addEventListener('DOMContentLoaded', () => {
 
     renderProducts();
     setupEventListeners();
+    
+    // Setup order form submission
+    const orderForm = document.getElementById('order-form');
+    if (orderForm) {
+        orderForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            orderDetails = {
+                name: document.getElementById('order-name').value,
+                email: document.getElementById('order-email').value,
+                phone: document.getElementById('order-phone').value,
+                address: document.getElementById('order-address').value,
+                delivery: document.getElementById('order-delivery').value,
+                message: document.getElementById('order-message').value
+            };
+            
+            closeModal('order-details-modal');
+            openModal('checkout-modal');
+        });
+    }
+    
+    // Set footer year
+    const yearElement = document.getElementById('year');
+    if (yearElement) {
+        yearElement.textContent = new Date().getFullYear();
+    }
 });
 
 /* ============================================
@@ -171,6 +212,9 @@ function viewProductDetails(productId) {
     const product = products.find(p => p.id === productId);
     if (!product) return;
     
+    currentProductId = productId;
+    currentRating = 0;
+    
     const productDetail = document.getElementById('product-detail');
     productDetail.innerHTML = `
         <div class="product-detail-image"><img src="${product.image}" alt="${product.name}" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 200 200%22%3E%3Crect fill=%22%23ddd%22 width=%22200%22 height=%22200%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 font-size=%2214%22 fill=%22%23999%22 text-anchor=%22middle%22 dominant-baseline=%22middle%22%3EProduct Image%3C/text%3E%3C/svg%3E'"></div>
@@ -189,7 +233,141 @@ function viewProductDetails(productId) {
         </div>
     `;
     
+    // Render reviews
+    renderReviews(productId);
+    
+    // Setup star rating input
+    setupStarRatingInput();
+    
     openModal('product-modal');
+}
+
+/* ============================================
+   Reviews & Ratings
+   ============================================ */
+
+function renderReviews(productId) {
+    const reviewsList = document.getElementById('reviews-list');
+    const productReviews = reviews[productId] || [];
+    
+    if (productReviews.length === 0) {
+        reviewsList.innerHTML = '<p class="no-reviews">No reviews yet. Be the first to review!</p>';
+    } else {
+        const avgRating = (productReviews.reduce((sum, r) => sum + r.rating, 0) / productReviews.length).toFixed(1);
+        
+        reviewsList.innerHTML = `
+            <div class="reviews-summary">
+                <div class="avg-rating">
+                    <div class="avg-rating-number">${avgRating}</div>
+                    <div class="avg-rating-stars">${generateStars(Math.round(avgRating))}</div>
+                    <div class="avg-rating-count">${productReviews.length} reviews</div>
+                </div>
+            </div>
+            <div class="reviews-items">
+                ${productReviews.map(review => `
+                    <div class="review-item">
+                        <div class="review-header">
+                            <div class="review-author">${review.author}</div>
+                            <div class="review-rating">${generateStars(review.rating)}</div>
+                        </div>
+                        <div class="review-text">${review.text}</div>
+                        <div class="review-date">${new Date(review.date).toLocaleDateString()}</div>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+    }
+}
+
+function setupStarRatingInput() {
+    const stars = document.querySelectorAll('.star-rating-input .star');
+    const ratingInput = document.getElementById('review-rating');
+    
+    stars.forEach(star => {
+        star.addEventListener('click', function() {
+            const rating = this.dataset.rating;
+            ratingInput.value = rating;
+            currentRating = rating;
+            
+            // Update visual state
+            stars.forEach(s => {
+                if (s.dataset.rating <= rating) {
+                    s.classList.add('active');
+                } else {
+                    s.classList.remove('active');
+                }
+            });
+        });
+        
+        // Hover effect
+        star.addEventListener('mouseover', function() {
+            const hoverRating = this.dataset.rating;
+            stars.forEach(s => {
+                if (s.dataset.rating <= hoverRating) {
+                    s.classList.add('hover');
+                } else {
+                    s.classList.remove('hover');
+                }
+            });
+        });
+    });
+    
+    document.querySelector('.star-rating-input').addEventListener('mouseout', function() {
+        stars.forEach(s => s.classList.remove('hover'));
+    });
+}
+
+function generateStars(rating) {
+    let stars = '';
+    for (let i = 1; i <= 5; i++) {
+        stars += i <= rating ? '★' : '☆';
+    }
+    return stars;
+}
+
+function submitReview() {
+    const rating = parseInt(document.getElementById('review-rating').value);
+    const reviewText = document.getElementById('review-text').value.trim();
+    const reviewerName = document.getElementById('reviewer-name').value.trim();
+    
+    if (!rating || rating < 1 || rating > 5) {
+        alert('Please select a rating (1-5 stars)');
+        return;
+    }
+    
+    if (!reviewText) {
+        alert('Please write a review');
+        return;
+    }
+    
+    if (!reviewerName) {
+        alert('Please enter your name');
+        return;
+    }
+    
+    if (!reviews[currentProductId]) {
+        reviews[currentProductId] = [];
+    }
+    
+    reviews[currentProductId].push({
+        author: reviewerName,
+        rating: rating,
+        text: reviewText,
+        date: new Date().toISOString()
+    });
+    
+    // Save to localStorage
+    localStorage.setItem('giftnest-reviews', JSON.stringify(reviews));
+    
+    // Clear form
+    document.getElementById('review-rating').value = 0;
+    document.getElementById('review-text').value = '';
+    document.getElementById('reviewer-name').value = '';
+    document.querySelectorAll('.star-rating-input .star').forEach(s => s.classList.remove('active'));
+    
+    // Refresh reviews
+    renderReviews(currentProductId);
+    alert('Thank you for your review!');
 }
 
 /* ============================================
@@ -296,7 +474,7 @@ function proceedToCheckout() {
     }
     
     closeModal('cart-modal');
-    openModal('checkout-modal');
+    openModal('order-details-modal');
 }
 
 function selectPayment(method) {
@@ -338,8 +516,39 @@ function selectPayment(method) {
 
 function completePayment() {
     const total = getCartTotal();
-    alert(`Payment of Rs. ${total.toFixed(2)} completed successfully!\n\nThank you for shopping at GiftNest.\nYour order has been confirmed.`);
+    
+    // Generate order ID
+    const date = new Date();
+    const orderId = `ORD-${date.getFullYear()}${String(date.getMonth() + 1).padStart(2, '0')}${String(date.getDate()).padStart(2, '0')}-${String(orders.length + 1).padStart(3, '0')}`;
+    
+    // Create order object
+    const order = {
+        orderId: orderId,
+        date: new Date().toISOString(),
+        customerName: orderDetails.name,
+        email: orderDetails.email,
+        phone: orderDetails.phone,
+        address: orderDetails.address,
+        delivery: orderDetails.delivery,
+        giftMessage: orderDetails.message,
+        items: [...cart],
+        total: total,
+        status: 'confirmed',
+        timeline: {
+            confirmed: new Date().toISOString(),
+            processing: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString(), // 2 hours later
+            shipped: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // 1 day later
+            delivered: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString() // 5 days later
+        }
+    };
+    
+    orders.push(order);
+    localStorage.setItem('giftnest-orders', JSON.stringify(orders));
+    
+    alert(`Payment of Rs. ${total.toFixed(2)} completed successfully!\n\nYour Order ID: ${orderId}\n\nThank you for shopping at GiftNest!\nYour order has been confirmed.`);
+    
     cart = [];
+    orderDetails = {};
     updateCartUI();
     closeModal('checkout-modal');
 }
@@ -351,6 +560,123 @@ function goBackToCart() {
 
 function getCartTotal() {
     return cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+}
+
+/* ============================================
+   Order Tracking Functions
+   ============================================ */
+
+function searchOrder() {
+    const orderId = document.getElementById('tracking-order-id').value.trim().toUpperCase();
+    
+    if (!orderId) {
+        alert('Please enter an Order ID');
+        return;
+    }
+    
+    const order = orders.find(o => o.orderId === orderId);
+    
+    if (!order) {
+        alert('Order not found. Please check the Order ID and try again.');
+        return;
+    }
+    
+    displayOrderTracking(order);
+}
+
+function displayOrderTracking(order) {
+    const trackingResult = document.getElementById('tracking-result');
+    const now = new Date();
+    
+    // Determine current status
+    let currentStatus = 'confirmed';
+    if (now >= new Date(order.timeline.delivered)) {
+        currentStatus = 'delivered';
+    } else if (now >= new Date(order.timeline.shipped)) {
+        currentStatus = 'shipped';
+    } else if (now >= new Date(order.timeline.processing)) {
+        currentStatus = 'processing';
+    }
+    
+    // Update status display
+    const statusMap = {
+        confirmed: { color: '#27ae60', text: '✓ Order Confirmed' },
+        processing: { color: '#f39c12', text: '⚙ Processing' },
+        shipped: { color: '#3498db', text: '📦 Shipped' },
+        delivered: { color: '#27ae60', text: '✓ Delivered' }
+    };
+    
+    const statusInfo = statusMap[currentStatus];
+    document.getElementById('order-status').innerHTML = `<span style="color: ${statusInfo.color}; font-weight: bold;">${statusInfo.text}</span>`;
+    document.getElementById('track-order-id').textContent = order.orderId;
+    
+    // Update timeline steps
+    updateTimelineStep('confirmed', order.timeline.confirmed, currentStatus);
+    updateTimelineStep('processing', order.timeline.processing, currentStatus);
+    updateTimelineStep('shipped', order.timeline.shipped, currentStatus);
+    updateTimelineStep('delivered', order.timeline.delivered, currentStatus);
+    
+    trackingResult.style.display = 'block';
+}
+
+function updateTimelineStep(step, date, currentStatus) {
+    const marker = document.getElementById(step + '-marker');
+    const dateElement = document.getElementById('track-' + step + '-date');
+    
+    const stepOrder = { confirmed: 0, processing: 1, shipped: 2, delivered: 3 };
+    const currentStatusOrder = { confirmed: 0, processing: 1, shipped: 2, delivered: 3 };
+    
+    if (stepOrder[step] <= currentStatusOrder[currentStatus]) {
+        marker.classList.add('completed');
+    } else {
+        marker.classList.remove('completed');
+    }
+    
+    const formattedDate = new Date(date).toLocaleDateString() + ' ' + new Date(date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    dateElement.textContent = formattedDate;
+}
+
+function openMyOrders() {
+    const myOrdersList = document.getElementById('my-orders-list');
+    
+    if (orders.length === 0) {
+        myOrdersList.innerHTML = '<p class="no-orders">No orders found.</p>';
+        return;
+    }
+    
+    myOrdersList.innerHTML = orders.map(order => `
+        <div class="my-order-item">
+            <div class="order-item-header">
+                <div class="order-item-id">${order.orderId}</div>
+                <div class="order-item-status" style="color: ${getStatusColor(order.status)}">${order.status.toUpperCase()}</div>
+            </div>
+            <div class="order-item-info">
+                <p><strong>Customer:</strong> ${order.customerName}</p>
+                <p><strong>Date:</strong> ${new Date(order.date).toLocaleDateString()}</p>
+                <p><strong>Total:</strong> Rs. ${order.total.toFixed(2)}</p>
+                <p><strong>Delivery:</strong> ${order.delivery}</p>
+            </div>
+            <button class="btn btn-small btn-primary" onclick="viewOrderDetails('${order.orderId}')">View Details</button>
+        </div>
+    `).join('');
+}
+
+function viewOrderDetails(orderId) {
+    const order = orders.find(o => o.orderId === orderId);
+    if (!order) return;
+    
+    displayOrderTracking(order);
+    closeModal('my-orders-modal');
+}
+
+function getStatusColor(status) {
+    const colors = {
+        confirmed: '#27ae60',
+        processing: '#f39c12',
+        shipped: '#3498db',
+        delivered: '#27ae60'
+    };
+    return colors[status] || '#333';
 }
 
 /* ============================================
@@ -415,8 +741,3 @@ document.querySelectorAll('.modal-content').forEach(content => {
     });
 });
 
-// set footer year
-document.addEventListener('DOMContentLoaded', () => {
-    const y = document.getElementById('year');
-    if (y) y.textContent = new Date().getFullYear();
-});
