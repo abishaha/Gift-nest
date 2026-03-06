@@ -19,6 +19,7 @@
             </div>
             <nav class="nav">
                 <a href="#products" class="nav-link">Products</a>
+                <a href="#feedback" class="nav-link">Feedback</a>
                 <a href="#" onclick="openModal('order-tracking-modal'); return false;" class="nav-link">Track Order</a>
                 <a href="#cart-icon" class="nav-link cart-icon-link">
                     🛒 Cart <span class="cart-count">0</span>
@@ -233,6 +234,60 @@
 
     <!-- Overlay -->
     <div id="overlay" class="overlay"></div>
+
+    <!-- Feedback Section -->
+    <section id="feedback" class="feedback-section">
+        <div class="container">
+            <h2 class="section-title">Share Your Feedback</h2>
+            <p class="feedback-intro">We value your opinion! Help us improve by sharing your thoughts about our service and products.</p>
+            <div class="feedback-container">
+                <div class="feedback-form">
+                    <h3>Leave Your Feedback</h3>
+                    <div class="rating-input">
+                        <label>Overall Rating:</label>
+                        <div class="star-rating-input" id="feedback-star-rating">
+                            <span class="star" data-rating="1">★</span>
+                            <span class="star" data-rating="2">★</span>
+                            <span class="star" data-rating="3">★</span>
+                            <span class="star" data-rating="4">★</span>
+                            <span class="star" data-rating="5">★</span>
+                        </div>
+                        <input type="hidden" id="feedback-rating" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="feedback-type">Feedback Type:</label>
+                        <select id="feedback-type">
+                            <option value="">Select type</option>
+                            <option value="service">Service</option>
+                            <option value="products">Products</option>
+                            <option value="delivery">Delivery</option>
+                            <option value="website">Website</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="feedback-text">Your Feedback:</label>
+                        <textarea id="feedback-text" placeholder="Tell us about your experience..." maxlength="1000" rows="5"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="feedback-name">Your Name (Optional):</label>
+                        <input type="text" id="feedback-name" placeholder="Your Name" maxlength="50">
+                    </div>
+                    <div class="form-group">
+                        <label for="feedback-email">Email (Optional):</label>
+                        <input type="email" id="feedback-email" placeholder="your.email@example.com">
+                    </div>
+                    <button class="btn btn-primary" onclick="submitFeedback()">Submit Feedback</button>
+                </div>
+                <div class="feedback-display">
+                    <h3>Recent Feedback</h3>
+                    <div class="feedback-list" id="feedback-list">
+                        <!-- Feedback will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
     <!-- Footer -->
     <footer class="footer">

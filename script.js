@@ -150,6 +150,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     renderProducts();
     setupEventListeners();
+    initFeedback();
     
     // Setup order form submission
     const orderForm = document.getElementById('order-form');
@@ -368,6 +369,133 @@ function submitReview() {
     // Refresh reviews
     renderReviews(currentProductId);
     alert('Thank you for your review!');
+}
+
+/* ============================================
+   Feedback Functions
+   ============================================ */
+
+let feedback = []; // Store general feedback
+
+function initFeedback() {
+    // Load feedback from localStorage
+    const savedFeedback = localStorage.getItem('giftnest-feedback');
+    if (savedFeedback) {
+        feedback = JSON.parse(savedFeedback);
+    }
+    
+    // Setup feedback star rating
+    setupFeedbackStarRating();
+    
+    // Render initial feedback
+    renderFeedback();
+}
+
+function setupFeedbackStarRating() {
+    const stars = document.querySelectorAll('#feedback-star-rating .star');
+    const ratingInput = document.getElementById('feedback-rating');
+    
+    stars.forEach(star => {
+        star.addEventListener('click', function() {
+            const rating = this.dataset.rating;
+            ratingInput.value = rating;
+            
+            // Update visual state
+            stars.forEach(s => {
+                if (s.dataset.rating <= rating) {
+                    s.classList.add('active');
+                } else {
+                    s.classList.remove('active');
+                }
+            });
+        });
+        
+        // Hover effect
+        star.addEventListener('mouseover', function() {
+            const hoverRating = this.dataset.rating;
+            stars.forEach(s => {
+                if (s.dataset.rating <= hoverRating) {
+                    s.classList.add('hover');
+                } else {
+                    s.classList.remove('hover');
+                }
+            });
+        });
+    });
+    
+    document.getElementById('feedback-star-rating').addEventListener('mouseout', function() {
+        stars.forEach(s => s.classList.remove('hover'));
+    });
+}
+
+function submitFeedback() {
+    const rating = parseInt(document.getElementById('feedback-rating').value);
+    const feedbackType = document.getElementById('feedback-type').value;
+    const feedbackText = document.getElementById('feedback-text').value.trim();
+    const feedbackName = document.getElementById('feedback-name').value.trim();
+    const feedbackEmail = document.getElementById('feedback-email').value.trim();
+    
+    if (!rating || rating < 1 || rating > 5) {
+        alert('Please select a rating (1-5 stars)');
+        return;
+    }
+    
+    if (!feedbackType) {
+        alert('Please select a feedback type');
+        return;
+    }
+    
+    if (!feedbackText) {
+        alert('Please write your feedback');
+        return;
+    }
+    
+    const newFeedback = {
+        id: Date.now(),
+        rating: rating,
+        type: feedbackType,
+        text: feedbackText,
+        name: feedbackName || 'Anonymous',
+        email: feedbackEmail,
+        date: new Date().toISOString()
+    };
+    
+    feedback.unshift(newFeedback); // Add to beginning of array
+    
+    // Save to localStorage
+    localStorage.setItem('giftnest-feedback', JSON.stringify(feedback));
+    
+    // Clear form
+    document.getElementById('feedback-rating').value = 0;
+    document.getElementById('feedback-type').value = '';
+    document.getElementById('feedback-text').value = '';
+    document.getElementById('feedback-name').value = '';
+    document.getElementById('feedback-email').value = '';
+    document.querySelectorAll('#feedback-star-rating .star').forEach(s => s.classList.remove('active'));
+    
+    // Refresh feedback display
+    renderFeedback();
+    alert('Thank you for your feedback!');
+}
+
+function renderFeedback() {
+    const feedbackList = document.getElementById('feedback-list');
+    
+    if (feedback.length === 0) {
+        feedbackList.innerHTML = '<p class="no-feedback">No feedback yet. Be the first to share your thoughts!</p>';
+    } else {
+        feedbackList.innerHTML = feedback.slice(0, 10).map(item => `
+            <div class="feedback-item">
+                <div class="feedback-type">${item.type}</div>
+                <div class="feedback-header">
+                    <div class="feedback-author">${item.name}</div>
+                    <div class="feedback-rating">${generateStars(item.rating)}</div>
+                </div>
+                <div class="feedback-text">${item.text}</div>
+                <div class="feedback-date">${new Date(item.date).toLocaleDateString()}</div>
+            </div>
+        `).join('');
+    }
 }
 
 /* ============================================
